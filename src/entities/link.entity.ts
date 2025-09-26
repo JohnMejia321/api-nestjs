@@ -1,38 +1,36 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { IsOptional, IsString } from 'class-validator';
-
+// link.entity.ts
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { IsOptional, IsString, Length } from 'class-validator';
+import { Permission } from './permission.entity';
 
 @Entity({ name: 'links' })
 export class Link {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-@PrimaryGeneratedColumn()
-id: number;
+  @Column()
+  @IsString()
+  @Length(1, 100)
+  name: string;
 
+  @Column()
+  @IsString()
+  path: string;
 
-@Column()
-@IsString()
-name: string;
+  @Column({ nullable: true })
+  @IsOptional()
+  @IsString()
+  loadComponent?: string;
 
+  @Column({ nullable: true, type: 'text' })
+  @IsOptional()
+  @IsString()
+  description?: string;
 
-@Column({ nullable: true })
-@IsOptional()
-path?: string;
+  // 🔹 Campos del modelo original (sin relaciones todavía)
+  @IsOptional()
+  permission?: Permission[];
 
-
-@Column({ nullable: true })
-@IsOptional()
-loadComponent?: string;
-
-
-@Column({ nullable: true, type: 'text' })
-@IsOptional()
-description?: string;
-
-
-@CreateDateColumn()
-createdAt: Date;
-
-
-@UpdateDateColumn()
-updatedAt: Date;
+  @IsOptional()
+  toolbar?: Permission[];
 }
