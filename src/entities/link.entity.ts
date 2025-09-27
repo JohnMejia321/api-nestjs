@@ -1,12 +1,13 @@
-// link.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { IsOptional, IsString, Length } from 'class-validator';
 import { Permission } from './permission.entity';
+import {Module} from './module.entity';
 
 @Entity({ name: 'links' })
 export class Link {
-  @PrimaryGeneratedColumn()
-  id: number;
+
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   @IsString()
@@ -27,10 +28,15 @@ export class Link {
   @IsString()
   description?: string;
 
-  // 🔹 Campos del modelo original (sin relaciones todavía)
-  @IsOptional()
-  permission?: Permission[];
+  // 🔗 Un enlace puede tener muchos permisos
+  @OneToMany(() => Permission, permission => permission.link)
+  permissions: Permission[];
 
-  @IsOptional()
-  toolbar?: Permission[];
+  // 🔗 Un enlace puede tener muchos permisos de toolbar
+  @OneToMany(() => Permission, permission => permission.linkToolbar)
+  toolbar: Permission[];
+
+  // 🔗 Un enlace pertenece a un módulo
+  @ManyToOne(() => Module, module => module.links, { eager: true })
+  module: Module;
 }

@@ -1,16 +1,19 @@
-// user.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { IsOptional, IsString, IsEmail, Length } from 'class-validator';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import { IsOptional, IsString, Length } from 'class-validator';
+import { IsAllowedEmailDomain } from '../validators/email-domain.validator';
+import { IsValidUsername } from '../validators/username.validator';
 import { Role } from './role.entity';
 
 @Entity({ name: 'users' })
 export class User {
+  
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
   @IsString()
   @Length(3, 50)
+  @IsValidUsername()
   username: string;
 
   @Column()
@@ -24,7 +27,7 @@ export class User {
   name: string;
 
   @Column({ unique: true })
-  @IsEmail()
+  @IsAllowedEmailDomain()
   email: string;
 
   @Column({ nullable: true })
@@ -38,7 +41,7 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // 🔹 Campo del modelo original (sin relación todavía)
-  @IsOptional()
-  role?: Role;
+  // 🔗 Relación: Muchos usuarios pueden tener un solo rol
+  @ManyToOne(() => Role, role => role.users, { eager: true })
+  role: Role;
 }

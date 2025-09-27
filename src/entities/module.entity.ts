@@ -1,13 +1,16 @@
 // module.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, OneToMany } from 'typeorm';
 import { IsOptional, IsString, IsBoolean, Length } from 'class-validator';
 import { Permission } from './permission.entity';
 import { Link } from './link.entity';
+import { Role } from './role.entity';
 
 @Entity({ name: 'modules' })
 export class Module {
-  @PrimaryGeneratedColumn()
-  id: number;
+
+
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   @IsString()
@@ -65,10 +68,16 @@ export class Module {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // 🔹 Campos del modelo original (sin relaciones aún)
-  @IsOptional()
-  permission?: Permission[];
+  // 🔗 Un módulo puede pertenecer a muchos roles y un rol puede tener muchos módulos
+  @ManyToMany(() => Role, role => role.modules)
+  roles: Role[];
 
-  @IsOptional()
-  links?: Link[];
+  // 🔗 Un módulo puede tener muchos permisos
+  @OneToMany(() => Permission, permission => permission.module)
+  permissions: Permission[];
+
+  // 🔗 Un módulo puede tener muchos enlaces
+  @OneToMany(() => Link, link => link.module)
+  links: Link[];
+
 }
